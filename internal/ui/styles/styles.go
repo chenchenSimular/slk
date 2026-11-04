@@ -295,7 +295,8 @@ func CurrentTheme() string { return currentTheme }
 // then rebuilds all composed styles.
 func Apply(themeName string, overrides core.Theme) {
 	version++
-	name, colors := resolveTheme(themeName)
+	currentSpec = themeName
+	name, colors := resolveTheme(ResolveColorSchemeSpec(themeName, darkBackground))
 	currentTheme = name
 
 	Primary = lipgloss.Color(colors.Primary)

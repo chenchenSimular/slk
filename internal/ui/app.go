@@ -1022,9 +1022,10 @@ func (a *App) Init() tea.Cmd {
 			tea.Tick(15*time.Second, func(time.Time) tea.Msg {
 				return LoadingTimeoutMsg{}
 			}),
+			startColorSchemeWatch(),
 		)
 	}
-	return nil
+	return startColorSchemeWatch()
 }
 
 // Update is the bubbletea entry point: the reducer chain in update,
@@ -1117,6 +1118,7 @@ func (a *App) update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		reduceSearch,
 		reduceWorkspace,
 		reduceTheme,
+		reduceColorScheme,
 		reduceNewMessagePicker,
 		reduceUserProfile,
 		reduceIO,

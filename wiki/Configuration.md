@@ -13,7 +13,8 @@ download_dir = "~/Downloads"    # where file attachments (`d` keybinding) are
                                 # saved. "~" is expanded to your home directory.
 
 [appearance]
-theme = "dracula"
+theme = "dracula"               # or "light:GitHub Light,dark:GitHub Dark" to follow
+                                # the terminal's light/dark scheme (see below)
 timestamp_format = "3:04 PM"
 show_avatars = true      # false hides the avatars beside messages
 thread_avatars = false   # true also shows them in the thread pane (needs show_avatars)
@@ -255,6 +256,24 @@ Pick the variant whose background matches your terminal's background.
 still computed as RGB approximations, so the tint regions of those
 elements use truecolor rather than your palette. The rest of the UI
 honors the palette.
+
+## Following the terminal's light/dark scheme
+
+Any theme setting (`[appearance].theme` or a workspace's `theme`) can name one
+theme per color scheme, in Ghostty's syntax:
+
+```toml
+[appearance]
+theme = "light:GitHub Light,dark:GitHub Dark"
+```
+
+slk asks the terminal for its background color (OSC 11) at startup and every
+2 seconds, and switches between the two themes when the terminal goes from
+light to dark or back, for example when macOS changes appearance and the
+terminal follows it. This works inside tmux, which answers for the attached
+client. A terminal that never answers keeps the dark side. Naming only one
+side (`"dark:Dracula"`) uses that theme for both. Picking a theme in the theme
+switcher (`Ctrl+y`) saves that single theme and stops following the scheme.
 
 ## Custom themes
 
