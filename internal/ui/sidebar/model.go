@@ -2578,10 +2578,13 @@ func (m *Model) ClickAt(y int) (ChannelItem, bool) {
 
 const (
 	defaultWidth = 30
-	minWidth     = 20
+	minWidth     = MinWidth
 	maxWidth     = 60
 	widthStep    = 5
 )
+
+// MinWidth is the narrowest the sidebar can be set to.
+const MinWidth = 20
 
 func (m Model) Width() int {
 	if m.width == 0 {

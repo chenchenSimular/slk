@@ -1071,7 +1071,7 @@ func (a *App) threadDrawnAlone() bool {
 		return false
 	}
 	var scratch panelLayout
-	frame := scratch.Compute(a.width, a.height, a.workspaceRail.Width(), a.sidebar.Width(),
+	frame := scratch.Compute(a.width, a.height, a.railWidth(), a.sidebarWidth(),
 		a.sidebarVisible, a.threadVisible, a.threadInFront())
 	return frame.MsgWidth == 0
 }
@@ -1079,8 +1079,33 @@ func (a *App) threadDrawnAlone() bool {
 // computeFrame resolves this frame's layout from the App's state and
 // stores the hit-test bands. The one place View's layout inputs are
 // assembled; tests call it instead of repeating Compute's arguments.
+// compactSidebarBelow is the terminal width under which the sidebar is
+// drawn at its minimum width whatever width is saved, so a phone-sized
+// terminal keeps room for the messages pane. The saved width is untouched.
+const compactSidebarBelow = 100
+
+// railWidth is the workspace rail's width this frame: hidden (0) with a
+// single workspace, where it has nothing to switch between. With none
+// (before the first workspace loads) it keeps its width.
+func (a *App) railWidth() int {
+	if a.workspaceRail.Len() == 1 {
+		return 0
+	}
+	return a.workspaceRail.Width()
+}
+
+// sidebarWidth is the sidebar's width this frame: the saved width, capped
+// at the minimum below compactSidebarBelow columns.
+func (a *App) sidebarWidth() int {
+	w := a.sidebar.Width()
+	if a.width > 0 && a.width < compactSidebarBelow {
+		w = min(w, sidebar.MinWidth)
+	}
+	return w
+}
+
 func (a *App) computeFrame() panelLayoutFrame {
-	return a.layout.Compute(a.width, a.height, a.workspaceRail.Width(), a.sidebar.Width(),
+	return a.layout.Compute(a.width, a.height, a.railWidth(), a.sidebarWidth(),
 		a.sidebarVisible, a.threadVisible, a.threadInFront())
 }
 
@@ -3644,7 +3669,9 @@ func (a *App) View() tea.View {
 	previewActive := a.preview.Active()
 
 	var panels []string
-	panels = append(panels, a.renderRail(frame.RailWidth, frame.ContentHeight, themeVer))
+	if frame.RailWidth > 0 {
+		panels = append(panels, a.renderRail(frame.RailWidth, frame.ContentHeight, themeVer))
+	}
 	if a.sidebarVisible {
 		panels = append(panels, a.renderSidebar(frame.SidebarWidth, frame.SidebarBorder, frame.ContentHeight, themeVer))
 	}

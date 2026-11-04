@@ -221,6 +221,9 @@ func (m Model) ClickAt(y int) (WorkspaceItem, bool) {
 	return m.items[idx], true
 }
 
+// Len returns how many workspaces the rail lists.
+func (m Model) Len() int { return len(m.items) }
+
 func (m Model) Width() int {
 	return 6 // 6 content, no border
 }
