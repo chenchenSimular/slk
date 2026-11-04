@@ -51,6 +51,20 @@ var commands = map[string]commandFunc{
 	"huddle":   cmdHuddle,
 	"help":     cmdHelp,
 	"version":  cmdVersion,
+	"unreads":  cmdUnreads,
+}
+
+// cmdUnreads toggles the sidebar's unread-only filter ([sidebar]
+// unread_only is where it starts). The f key calls this same handler.
+// The sidebar marks the filter with an "Unreads only" row.
+func cmdUnreads(a *App, _ commandArgs) tea.Cmd {
+	on := !a.sidebar.UnreadOnly()
+	a.sidebar.SetUnreadOnly(on)
+	text := "Sidebar: all conversations"
+	if on {
+		text = "Sidebar: unreads only"
+	}
+	return toastWithClear(a, text, 2*time.Second)
 }
 
 // cmdVersion toasts the running build's version and short commit (see

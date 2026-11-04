@@ -192,6 +192,14 @@ type Sidebar struct {
 	// ActiveOnly hides conversations with no activity in 30 days, in
 	// every section, like Slack's "Active only" filter. Default off.
 	ActiveOnly bool `toml:"active_only"`
+	// UnreadOnly starts the sidebar showing only conversations with
+	// unread messages (the active one always shows). Toggled at runtime
+	// with f or :unreads. Default off.
+	UnreadOnly bool `toml:"unread_only"`
+	// HideApps hides app/bot DMs from the sidebar unless they have
+	// unread messages or are active. The channel finder still lists
+	// them. Default off.
+	HideApps bool `toml:"hide_apps"`
 	// MouseResize lets a drag of the sidebar's right border resize it.
 	// Default off.
 	MouseResize bool `toml:"mouse_resize"`

@@ -927,6 +927,16 @@ func TestConfig_SidebarSlackOptions(t *testing.T) {
 	}
 }
 
+func TestConfig_SidebarUnreadOnlyAndHideApps(t *testing.T) {
+	if s := loadConfigString(t, "[sidebar]\n").Sidebar; s.UnreadOnly || s.HideApps {
+		t.Errorf("defaults: unread_only=%v hide_apps=%v, want both off", s.UnreadOnly, s.HideApps)
+	}
+	s := loadConfigString(t, "[sidebar]\nunread_only = true\nhide_apps = true\n").Sidebar
+	if !s.UnreadOnly || !s.HideApps {
+		t.Errorf("parsed %+v", s)
+	}
+}
+
 func TestMatchSectionAndOrder_ExplicitOrder(t *testing.T) {
 	c := Config{
 		Sections: map[string]SectionDef{

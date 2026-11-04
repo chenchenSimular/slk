@@ -3560,6 +3560,8 @@ type SidebarStyle struct {
 	Slack        bool   // slack_style
 	PrivateGlyph string // private_glyph
 	ActiveOnly   bool   // active_only
+	UnreadOnly   bool   // unread_only
+	HideApps     bool   // hide_apps
 	MouseResize  bool   // mouse_resize
 }
 
@@ -3568,6 +3570,8 @@ func (a *App) SetSidebarStyle(s SidebarStyle) {
 	a.sidebar.SetSlackStyle(s.Slack)
 	a.sidebar.SetPrivateGlyph(s.PrivateGlyph)
 	a.sidebar.SetActiveOnly(s.ActiveOnly)
+	a.sidebar.SetUnreadOnly(s.UnreadOnly)
+	a.sidebar.SetHideApps(s.HideApps)
 	a.sidebarMouseResize = s.MouseResize
 }
 

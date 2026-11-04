@@ -39,6 +39,8 @@ func sidebarStyleFromConfig(s config.Sidebar) ui.SidebarStyle {
 		Slack:        s.SlackStyle,
 		PrivateGlyph: s.PrivateGlyph,
 		ActiveOnly:   s.ActiveOnly,
+		UnreadOnly:   s.UnreadOnly,
+		HideApps:     s.HideApps,
 		MouseResize:  s.MouseResize,
 	}
 }

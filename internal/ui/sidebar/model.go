@@ -306,6 +306,12 @@ type Model struct {
 	// activeOnly hides conversations inactive for activeOnlyWindow in
 	// every section, like Slack's "Active only" ([sidebar] active_only).
 	activeOnly bool
+	// unreadOnly shows only conversations with unread messages
+	// ([sidebar] unread_only, toggled at runtime). See passesFilters.
+	unreadOnly bool
+	// hideApps hides app/bot DMs that have nothing unread
+	// ([sidebar] hide_apps). See passesFilters.
+	hideApps bool
 
 	// Staleness filter: items whose last_read_ts (from the read-state
 	// DB, fetched via readStateReader in rebuildFilter) is older than
@@ -510,7 +516,9 @@ func (m *Model) Invalidate() {
 	m.cacheValid = false
 	m.dirty()
 	// active_only: a dormant channel that gets a new message comes back.
-	if m.activeOnly {
+	// unread_only / hide_apps: a conversation read elsewhere goes, one
+	// that turned unread comes back.
+	if m.activeOnly || m.unreadOnly || m.hideApps {
 		m.refilter()
 	}
 }
@@ -719,6 +727,39 @@ func (m *Model) SetPrivateGlyph(glyph string) {
 func (m *Model) SetActiveOnly(enabled bool) {
 	m.activeOnly = enabled
 	m.refilter()
+}
+
+// SetUnreadOnly shows only conversations with unread messages (and the
+// active one) when enabled ([sidebar] unread_only).
+func (m *Model) SetUnreadOnly(enabled bool) {
+	if m.unreadOnly == enabled {
+		return
+	}
+	m.unreadOnly = enabled
+	m.refilter()
+}
+
+// UnreadOnly reports whether the unread-only filter is on.
+func (m *Model) UnreadOnly() bool { return m.unreadOnly }
+
+// SetHideApps hides app/bot DMs that have nothing unread, unless active
+// ([sidebar] hide_apps). The channel finder still lists them.
+func (m *Model) SetHideApps(enabled bool) {
+	if m.hideApps == enabled {
+		return
+	}
+	m.hideApps = enabled
+	m.refilter()
+}
+
+// HideApps reports whether read app/bot DMs are hidden.
+func (m *Model) HideApps() bool { return m.hideApps }
+
+// hasUnreadForFilter is what unread_only and hide_apps count as unread:
+// the unread dot or a mention badge, so a muted conversation shows when
+// someone mentions you, as its badge does, and not for chatter.
+func hasUnreadForFilter(item ChannelItem, state core.ReadState) bool {
+	return item.IsVisiblyUnread(state) || item.MentionBadge(state) > 0
 }
 
 // refilter re-runs the filter and sort, keeping the cursor on its row.
@@ -1448,6 +1489,10 @@ func (m *Model) rebuildFilter() {
 		if item.ID != m.activeID && m.activeOnly && isInactive(item, state, now) {
 			continue
 		}
+		if item.ID != m.activeID && (m.unreadOnly || (m.hideApps && item.Type == "app")) &&
+			!hasUnreadForFilter(item, state) {
+			continue
+		}
 		m.filtered = append(m.filtered, i)
 	}
 	m.sortFiltered()
@@ -1677,6 +1722,9 @@ func mentionBadgeStyleFor(muted bool) lipgloss.Style {
 	return styles.MentionBadgeStyle()
 }
 
+// unreadOnlyLabel marks the sidebar while the unread-only filter is on.
+const unreadOnlyLabel = "Unreads only"
+
 // renderRow describes a single rendered row in the sidebar.
 //
 // For navigable rows (Threads, section headers, channel items) we
@@ -1899,8 +1947,16 @@ func (m *Model) buildCache(width int) {
 	})
 
 	// Blank separator between the Threads/Activity rows and the first
-	// section (or below them when there are no channels at all).
-	m.cacheRows = append(m.cacheRows, renderRow{height: 1, navIdx: -1})
+	// section (or below them when there are no channels at all). With
+	// the unread-only filter on, the row says so instead of staying
+	// blank, so a short sidebar does not look like lost channels.
+	separator := renderRow{height: 1, navIdx: -1}
+	if m.unreadOnly {
+		// Truncated, never wrapped: the row is counted as one line.
+		label := truncate.StringWithTail(unreadOnlyLabel, uint(max(width-4, 0)), "…")
+		separator.normal = styles.SectionHeader.Width(width - 2).MaxHeight(1).Render(label)
+	}
+	m.cacheRows = append(m.cacheRows, separator)
 
 	// Pre-build the per-section channel rows so we can flatten with
 	// section headers below. Channels in a collapsed section are still

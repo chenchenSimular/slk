@@ -29,6 +29,7 @@
 | `/` | Normal | Search in channel (vim-style; searches cached history of the current channel) |
 | `n` / `N` | Normal | Next / previous search match (wraps) |
 | `a` / `A` | Normal | Jump to next / previous unread channel (wraps) |
+| `f` / `:unreads` | Normal | Toggle the sidebar's unread-only filter (an "Unreads only" row marks it; `[sidebar] unread_only` sets where it starts) |
 | `Ctrl+h` / `Ctrl+l` | Normal | Navigate back / forward through visited channels, returning to the message you were reading when you left (`Ctrl+k` also works) |
 | `Esc` | Normal (search active) | Clear active search |
 | `m{a-z}` | Normal (message) | Set a session mark on the selected message — lost when slk exits |

@@ -30,6 +30,7 @@ the status bar beside the prompt, with the current one highlighted.
 | `:vsp` | `Ctrl+w v` | Split the focused window side by side |
 | `:q` | `Ctrl+w q` | Close the focused window. This never quits slk: on the last window it says "Cannot close last window" |
 | `:only` (or `:on`) | `Ctrl+w o` | Close every window except the focused one |
+| `:unreads` | `f` | Toggle the sidebar between every conversation and only those with unread messages. The open conversation always stays, and an "Unreads only" row under Activity marks the filter. `[sidebar] unread_only` sets where it starts |
 | `:help` | `?` | Open the keybindings overlay, which also lists every `:` command |
 | `:version` | `slk --version` from the shell, which also prints the build date | Show the running build's version and short commit in the status bar |
 

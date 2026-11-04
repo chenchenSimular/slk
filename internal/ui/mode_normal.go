@@ -338,6 +338,9 @@ func handleNormalMode(a *App, msg tea.KeyMsg) tea.Cmd {
 	case a.view == ViewActivity && key.Matches(msg, a.keys.ActivityUnread):
 		return func() tea.Msg { return ActivityToggleUnreadMsg{} }
 
+	case key.Matches(msg, a.keys.SidebarUnreadOnly):
+		return cmdUnreads(a, commandArgs{})
+
 	case key.Matches(msg, a.keys.DownloadFile):
 		return a.downloadFilesOfSelected()
 

@@ -72,7 +72,13 @@ slack_style = false         # true: Slack's look: no ▾ on open sections, plain
 private_glyph = "◆"         # glyph before private channels, e.g. a lock your font has
                             # (sidebar only: the finder and pane header keep ◆)
 active_only = false         # true: hide conversations with no activity in 30 days, in
-                            # every section (Slack's "Active only"; unread ones stay)
+                            # every section (Slack's "Active only"; unread ones stay).
+                            # Closed DMs, group DMs and app DMs count as inactive
+unread_only = false         # true: start with the sidebar showing only conversations
+                            # with unread messages (muted ones only when they mention
+                            # you); the open one always shows. f or :unreads toggles it
+hide_apps = false           # true: hide app/bot DMs unless they have unread messages
+                            # or are open; Ctrl+t / Ctrl+p still find them
 mouse_resize = false        # true: drag the sidebar's right border to resize it
                             # ([ and ] also resize; the width is saved per workspace)
 
