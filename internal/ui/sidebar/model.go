@@ -758,7 +758,16 @@ func (m *Model) HideApps() bool { return m.hideApps }
 // hasUnreadForFilter is what unread_only and hide_apps count as unread:
 // the unread dot or a mention badge, so a muted conversation shows when
 // someone mentions you, as its badge does, and not for chatter.
+//
+// A muted app DM never counts. Slack counts every unread message of an
+// IM in its mention_count, so an app DM's badge is not a mention of you,
+// and muting the app is the user saying it never needs them. Only the
+// active conversation (exempt in rebuildFilter) shows it then. Muted
+// human DMs keep the mention rule.
 func hasUnreadForFilter(item ChannelItem, state core.ReadState) bool {
+	if item.Type == "app" && item.IsMuted {
+		return false
+	}
 	return item.IsVisiblyUnread(state) || item.MentionBadge(state) > 0
 }
 

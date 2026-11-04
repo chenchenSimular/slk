@@ -20,6 +20,9 @@ func filterFixture(t *testing.T) (*Model, map[string]cache.ReadState) {
 		{ID: "A1", Name: "github", Type: "app"},
 		{ID: "A2", Name: "pagerduty", Type: "app"},
 		{ID: "A3", Name: "jira", Type: "app"},
+		{ID: "A4", Name: "ashby", Type: "app", IsMuted: true},
+		{ID: "A5", Name: "vanta", Type: "app", IsMuted: true},
+		{ID: "D3", Name: "carol", Type: "dm", IsMuted: true},
 	})
 	state := map[string]cache.ReadState{
 		"C1": {LastReadTS: "1.0", HasUnread: true},
@@ -31,6 +34,10 @@ func filterFixture(t *testing.T) (*Model, map[string]cache.ReadState) {
 		"A1": {LastReadTS: "1.0"},
 		"A2": {LastReadTS: "1.0", HasUnread: true},
 		"A3": {LastReadTS: "1.0"},
+		// Slack badges every unread IM message, muted or not.
+		"A4": {LastReadTS: "1.0", HasUnread: true, MentionCount: 79},
+		"A5": {LastReadTS: "1.0", HasUnread: true, MentionCount: 4},
+		"D3": {LastReadTS: "1.0", HasUnread: true, MentionCount: 2},
 	}
 	m.SetReadStateReader(func() map[string]cache.ReadState { return state })
 	return &m, state
@@ -116,4 +123,39 @@ func TestHideApps_KeepsItemsForOtherReaders(t *testing.T) {
 	if !found {
 		t.Error("hide_apps dropped github from AllItems")
 	}
+}
+
+// A muted app DM stays hidden however many unread messages it has (Slack
+// badges each one); only the open conversation shows it. A muted human
+// DM still shows on its mention badge.
+func TestMutedAppDMsStayHidden(t *testing.T) {
+	for _, tc := range []struct {
+		name  string
+		setup func(m *Model)
+	}{
+		{"hide_apps", func(m *Model) { m.SetHideApps(true) }},
+		{"unread_only", func(m *Model) { m.SetUnreadOnly(true) }},
+		{"both", func(m *Model) { m.SetHideApps(true); m.SetUnreadOnly(true) }},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			m, _ := filterFixture(t)
+			m.SetActiveChannelID("A5")
+			tc.setup(m)
+			assertVisible(t, m, []string{"vanta", "pagerduty", "carol"}, []string{"ashby"})
+		})
+	}
+	// Without either filter they are ordinary rows.
+	m, _ := filterFixture(t)
+	assertVisible(t, m, []string{"ashby", "vanta"}, nil)
+}
+
+func TestMutedAppDMStaysInItems(t *testing.T) {
+	m, _ := filterFixture(t)
+	m.SetHideApps(true)
+	for _, it := range m.AllItems() {
+		if it.Name == "ashby" {
+			return
+		}
+	}
+	t.Error("hide_apps dropped the muted app DM from AllItems")
 }

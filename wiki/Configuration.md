@@ -76,9 +76,12 @@ active_only = false         # true: hide conversations with no activity in 30 da
                             # Closed DMs, group DMs and app DMs count as inactive
 unread_only = false         # true: start with the sidebar showing only conversations
                             # with unread messages (muted ones only when they mention
-                            # you); the open one always shows. f or :unreads toggles it
+                            # you; muted app DMs never); the open one always shows.
+                            # f or :unreads toggles it
 hide_apps = false           # true: hide app/bot DMs unless they have unread messages
-                            # or are open; Ctrl+t / Ctrl+p still find them
+                            # or are open; a muted app DM shows only while open,
+                            # however many unread messages it has (also under
+                            # unread_only). Ctrl+t / Ctrl+p still find them
 mouse_resize = false        # true: drag the sidebar's right border to resize it
                             # ([ and ] also resize; the width is saved per workspace)
 
