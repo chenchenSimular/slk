@@ -116,3 +116,51 @@ func TestActiveOnly_DormantChannelReturnsOnANewMessage(t *testing.T) {
 		t.Errorf("dormant channel still hidden after a new message:\n%s", view)
 	}
 }
+
+// TestActiveOnly_HidesClosedAppDMs: an app DM closed with
+// conversations.close has no last_read (client.counts omits it), the
+// same signal that hides a closed 1:1 DM. active_only must hide it in
+// every section, while an open, unread or active app DM stays.
+func TestActiveOnly_HidesClosedAppDMs(t *testing.T) {
+	now := time.Unix(1_800_000_000, 0)
+	recent := fmt.Sprintf("%d.000000", now.Add(-time.Hour).Unix())
+	m := New([]ChannelItem{
+		{ID: "D1", Name: "closedbot", Type: "app"},
+		{ID: "D2", Name: "starredbot", Type: "app", Section: "Starred"},
+		{ID: "D3", Name: "openbot", Type: "app"},
+		{ID: "D4", Name: "pingbot", Type: "app"},
+		{ID: "D5", Name: "activebot", Type: "app"},
+		{ID: "D6", Name: "closedhuman", Type: "dm"},
+	})
+	m.nowFn = func() time.Time { return now }
+	m.SetReadStateReader(func() map[string]cache.ReadState {
+		return map[string]cache.ReadState{
+			"D3": {LastReadTS: recent},
+			"D4": {HasUnread: true},
+		}
+	})
+	m.SetActiveChannelID("D5")
+	m.SetActiveOnly(true)
+	assertVisible(t, &m, []string{"openbot", "pingbot", "activebot"},
+		[]string{"closedbot", "starredbot", "closedhuman"})
+}
+
+// assertVisible checks which item names survive the sidebar's filters
+// (m.VisibleItems, so collapsed sections do not matter).
+func assertVisible(t *testing.T, m *Model, shown, hidden []string) {
+	t.Helper()
+	got := map[string]bool{}
+	for _, it := range m.VisibleItems() {
+		got[it.Name] = true
+	}
+	for _, name := range shown {
+		if !got[name] {
+			t.Errorf("%s hidden, want shown (visible: %v)", name, got)
+		}
+	}
+	for _, name := range hidden {
+		if got[name] {
+			t.Errorf("%s shown, want hidden (visible: %v)", name, got)
+		}
+	}
+}

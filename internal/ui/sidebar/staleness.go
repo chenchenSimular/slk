@@ -28,7 +28,9 @@ import (
 //   - lastReadTS is malformed or in the future (defensive defaults)
 //
 // Empty lastReadTS is type-aware:
-//   - For "dm" and "group_dm", empty IS stale. Slack's client.counts
+//   - For "dm", "app" and "group_dm", empty IS stale. An app DM is an
+//     IM like a 1:1 DM ("app" is slk's name for an IM whose peer is a
+//     bot), and Slack reports it the same way. Slack's client.counts
 //     endpoint only returns these types when the conversation is
 //     currently "open"; absence in counts (which surfaces here as
 //     empty lastReadTS) is Slack's canonical "this conversation is
@@ -53,9 +55,9 @@ func IsStale(item ChannelItem, hasUnread bool, lastReadTS string, threshold time
 		return false
 	}
 	if lastReadTS == "" {
-		// dm/group_dm without a last_read = closed conversation.
+		// dm/app/group_dm without a last_read = closed conversation.
 		// Other types: defensive, prefer to show.
-		return item.Type == "dm" || item.Type == "group_dm"
+		return isClosable(item.Type)
 	}
 	lastRead, ok := parseSlackTS(lastReadTS)
 	if !ok {
@@ -65,6 +67,14 @@ func IsStale(item ChannelItem, hasUnread bool, lastReadTS string, threshold time
 		return false
 	}
 	return now.Sub(lastRead) > threshold
+}
+
+// isClosable reports whether a conversation type is one Slack opens and
+// closes (conversations.close): 1:1 DMs, app DMs and group DMs.
+// client.counts lists these only while open, so an empty last_read for
+// one of them means the conversation is closed.
+func isClosable(chType string) bool {
+	return chType == "dm" || chType == "app" || chType == "group_dm"
 }
 
 // activeOnlyWindow is the inactivity span of Slack's "Active only"

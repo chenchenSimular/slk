@@ -98,6 +98,23 @@ func TestIsStale(t *testing.T) {
 			want:       true,
 		},
 		{
+			// App DMs are IMs too: closed with conversations.close,
+			// they drop out of client.counts exactly like a 1:1 DM.
+			name:       "empty LastReadTS on app DM IS stale",
+			item:       ChannelItem{ID: "D_APP", Type: "app"},
+			lastReadTS: "",
+			threshold:  threshold,
+			want:       true,
+		},
+		{
+			name:       "empty LastReadTS on unread app DM is NOT stale",
+			item:       ChannelItem{ID: "D_APP", Type: "app"},
+			lastReadTS: "",
+			hasUnread:  true,
+			threshold:  threshold,
+			want:       false,
+		},
+		{
 			name:       "empty LastReadTS on group_dm IS stale",
 			item:       ChannelItem{ID: "MPDM1", Type: "group_dm"},
 			lastReadTS: "",
