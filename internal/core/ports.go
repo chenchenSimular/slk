@@ -298,6 +298,12 @@ type ChannelService interface {
 	// ChannelMessagingCapabilityMsg. Costs a round trip, so only call
 	// it for a channel already known to be an app/bot DM.
 	MessagingCapability(channelID ids.ChannelID) Cmd
+
+	// SetMuted mutes (muted=true) or unmutes channelID in workspace
+	// teamID for the user, on Slack's servers, so other clients follow.
+	// Returns a Cmd whose resolved Msg is ChannelMuteSetMsg; nil when
+	// not wired.
+	SetMuted(teamID string, channelID ids.ChannelID, muted bool) Cmd
 }
 
 // SearchService runs message searches. SearchChannel queries the local

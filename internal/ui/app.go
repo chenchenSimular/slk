@@ -1108,6 +1108,7 @@ func (a *App) update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		reduceFocus,
 		reduceSend,
 		reduceRemovePreview,
+		reduceMute,
 		reduceActionPrompt,
 		reduceSlashCommand,
 		reduceChannels,

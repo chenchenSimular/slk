@@ -840,6 +840,16 @@ type NewMessageFailedMsg struct {
 	Err       error
 }
 
+// ChannelMuteSetMsg is the result of ChannelService.SetMuted: muting
+// (Muted=true) or unmuting ChannelID in workspace TeamID. Err is nil
+// when Slack accepted the change.
+type ChannelMuteSetMsg struct {
+	TeamID    string
+	ChannelID string
+	Muted     bool
+	Err       error
+}
+
 // ChannelMessagingCapabilityMsg carries the result of a
 // ChannelService.MessagingCapability probe. CanSend defaults true on
 // a failed probe, so a network failure never hides compose for a

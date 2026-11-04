@@ -12,6 +12,7 @@
 | `Esc` | Insert / Command | Return to normal mode |
 | `:` | Normal | Command prompt (`:ws`, `:marks`, `:sp`, … — see [[Commands]]) |
 | `?` / `:help` | Normal | Show every keybinding and `:` command; `/` filters the list |
+| `:mute` / `:unmute` | Normal | Mute or unmute the conversation on screen; syncs to Slack, so other clients follow |
 | `:version` | Normal | Show the running build's version and commit (`slk --version` also prints the build date) |
 | `Tab` / `Shift+Tab` | Command | Complete the command name; press again to cycle through the matches, which the status bar lists beside the prompt |
 | `Enter` | Insert | Send message (`[compose] stay_in_insert_after_send = true` keeps insert mode for the next one, except after sending an attachment, which returns to normal mode while it uploads) |

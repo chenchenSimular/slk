@@ -31,6 +31,8 @@ the status bar beside the prompt, with the current one highlighted.
 | `:q` | `Ctrl+w q` | Close the focused window. This never quits slk: on the last window it says "Cannot close last window" |
 | `:only` (or `:on`) | `Ctrl+w o` | Close every window except the focused one |
 | `:unreads` | `f` | Toggle the sidebar between every conversation and only those with unread messages. The open conversation always stays, and an "Unreads only" row under Activity marks the filter. `[sidebar] unread_only` sets where it starts |
+| `:mute` | | Mute the conversation on screen (the same one `:huddle` picks) on Slack's servers, so it is muted in every Slack client too. The sidebar dims it at once |
+| `:unmute` | | Unmute the conversation on screen, the same way |
 | `:help` | `?` | Open the keybindings overlay, which also lists every `:` command |
 | `:version` | `slk --version` from the shell, which also prints the build date | Show the running build's version and short commit in the status bar |
 

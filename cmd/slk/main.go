@@ -859,6 +859,16 @@ func run() error {
 					}
 				}
 			},
+			SetMuted: func(teamID string, channelID ids.ChannelID, muted bool) core.Cmd {
+				// By workspace ID: the user may switch before it runs.
+				var client channelMuter
+				if wctx := router.ByID(teamID); wctx != nil && wctx.Client != nil {
+					client = wctx.Client
+				}
+				return func() core.Msg {
+					return setMuted(context.Background(), client, teamID, channelID, muted)
+				}
+			},
 			MessagingCapability: func(channelID ids.ChannelID) core.Cmd {
 				wctx := router.Active()
 				if wctx == nil || wctx.Client == nil {

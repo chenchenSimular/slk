@@ -323,6 +323,7 @@ type ChannelServiceFuncs struct {
 	OpenConversation    func(userIDs []string, requestID uint64) Cmd
 	SearchRemote        func(query string) []ChannelFinderItem
 	MessagingCapability func(channelID ids.ChannelID) Cmd
+	SetMuted            func(teamID string, channelID ids.ChannelID, muted bool) Cmd
 }
 
 // NewChannelService builds a ChannelService from a
@@ -424,6 +425,13 @@ func (c channelAdapter) MessagingCapability(channelID ids.ChannelID) Cmd {
 		return nil
 	}
 	return c.fns.MessagingCapability(channelID)
+}
+
+func (c channelAdapter) SetMuted(teamID string, channelID ids.ChannelID, muted bool) Cmd {
+	if c.fns.SetMuted == nil {
+		return nil
+	}
+	return c.fns.SetMuted(teamID, channelID, muted)
 }
 
 // SearchServiceFuncs is the closure bundle accepted by

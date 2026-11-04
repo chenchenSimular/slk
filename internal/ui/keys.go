@@ -56,6 +56,8 @@ type KeyMap struct {
 	ActivityView        key.Binding
 	ActivityUnread      key.Binding
 	SidebarUnreadOnly   key.Binding
+	Mute                key.Binding
+	Unmute              key.Binding
 	WorkspaceFinder     key.Binding
 	NewMessage          key.Binding
 	ThemeSwitcher       key.Binding
@@ -145,6 +147,9 @@ func DefaultKeyMap() KeyMap {
 		ActivityUnread: key.NewBinding(key.WithKeys("u"), key.WithHelp("u", "Activity: toggle unread-only")),
 		// Not u: that is the Activity view's own unread-only filter.
 		SidebarUnreadOnly: key.NewBinding(key.WithKeys("f"), key.WithHelp("f / :unreads", "sidebar: toggle unread-only")),
+		// Keyless, like MarksList: dispatched from the command registry.
+		Mute:   key.NewBinding(key.WithHelp(":mute", "mute this conversation (syncs to Slack)")),
+		Unmute: key.NewBinding(key.WithHelp(":unmute", "unmute this conversation")),
 		// Keyless: ctrl+w is reserved as the window-command prefix
 		// (window-management design §4). The keyless binding never
 		// matches but keeps the help-overlay entry pointing at :ws
